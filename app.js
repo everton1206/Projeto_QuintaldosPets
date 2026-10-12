@@ -53,39 +53,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            // Credenciais Oficiais Atualizadas
             const VALID_USER = 'operador_vet';
+            const VALID_PASS_PLAIN = 'Alpha#PetCare99';
+            const VALID_PASS_HASH = '3d8ebc1e30a5ca6c8ca30a10336ae9a9fba7566d54cf8bf15e1823ebfc634a47';
+
+            // Calcula o hash da senha informada
             const hashedInput = await sha256(password);
 
-            // Hashes das senhas oficiais do projeto
-            const HASH_VET_MASTER = '256a26df093771144ffe808bfa6127d56e69911e77b61458c23b223e5f91f6ad'; // VetMaster@2026Secure
-            const HASH_PET_SEGURO = '3393a2ff8a08ff8f32c5f8c9d2ffecbf0c7d2b87a45f1084aeed72ccfb0528e1'; // PetSeguro@2026
-            const HASH_ORIGINAL   = '899f8eb7ff3b99dbfe595568ef5c1103c81216666df3b3e2182046fa32d43a67';
-
-            const isValidPassword = (
-                hashedInput === HASH_VET_MASTER ||
-                hashedInput === HASH_PET_SEGURO ||
-                hashedInput === HASH_ORIGINAL ||
-                password === 'VetMaster@2026Secure' ||
-                password === 'PetSeguro@2026' ||
-                password === 'senha123'
-            );
-
-            if (username === VALID_USER && isValidPassword) {
-                // OWASP A01: Emissão de token de sessão criptográfico
+            if (username === VALID_USER && (hashedInput === VALID_PASS_HASH || password === VALID_PASS_PLAIN)) {
+                // OWASP A01: Emissão de token volátil criptograficamente seguro
                 const sessionToken = crypto.randomUUID();
                 sessionStorage.setItem(SESSION_TOKEN_KEY, sessionToken);
                 sessionStorage.setItem(SESSION_USER_KEY, username);
 
                 showSuccessView(username);
             } else {
-                // OWASP A07: Resposta genérica contra enumeração
+                // OWASP A07: Resposta genérica contra enumeração de credenciais
                 showMessage('Credenciais inválidas. Tente novamente.', 'erro');
             }
         });
     }
 
     function showSuccessView(user) {
-        // Oculta o formulário ou container existente
+        // Encontra o container do login na página para substituir pelo painel
         const container = document.querySelector('.login-container') || form?.parentElement || form;
         if (container) {
             container.innerHTML = `
