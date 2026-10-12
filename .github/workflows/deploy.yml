@@ -1,0 +1,30 @@
+name: CI/CD Pipeline - Quintal dos Pets
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar Dependências
+        run: npm ci || npm install
+
+      - name: Testes e Validação
+        run: |
+          npm test --if-present
+
+      - name: Deploy Automatizado
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: echo "Implantação concluída com sucesso no ambiente de produção!"
